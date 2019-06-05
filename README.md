@@ -88,3 +88,142 @@ $ source ~/.bash_profile로 리프레쉬
 ### 특정 table 확인
 
  `.schema boards_board` 
+
+
+
+`$ python manage.py shell` - django DB를 작성할 수 있는 shell
+
+-> 매일 치기 싫으면 `pip install django-extensions`
+
+INSTALLED_APPS =[ ] - 에 추가해야함.
+
+`$ python manage.y shell_plus`를 하면 django에 대한 모든것 import 됨.
+
+
+
+> ### 1.
+>
+> from boards.models import Board
+> Board.objects.all()  (select * from boards_board와 같은 의미)
+> -><QuerySet []>
+>
+> board = Board()
+> board.title = 'first'
+> board.content = 'django!!'
+> -><Board: Board object (None)>
+> board.save()
+> board
+> -><Board: Board object (1)>
+>
+> ### 2.
+>
+> board=Board(title='second',content='django!!!')
+> board.save()
+>
+> ### 3.
+>
+> Board.objects.create(title='third',content='django!!!!')
+> save가 따로 필요없음.
+
+
+
+ 
+
+### * 유효성 검증
+
+board.full_clean()
+
+
+
+## 데이터 조회(C)
+
+`Board.objects.all()` 
+
+조회할 때 표현 바꾸기 
+
+`models.py`에서 해당 메소드 추가
+
+```python
+def __str__(self):
+    return f'{self.id}글 - {self.title}: {self.content}'
+```
+
+board = Board.objects.filter(id=1)  -여러개
+
+<QuerySet [<Board: 1글 - first: django!!>]>
+
+
+
+SELECT * FROM boards WHERE id=1
+
+board = Board.objects.get(pk=1)
+
+board = Board.objects.get(id=1)
+
+board로 확인
+
+boards = Board.objects.filter(title__contains='fi')
+
+boards = Board.objects.filter(content__endwith='!')
+
+boards = Board.objects.order_by('title') - 오름차순
+
+boards = Board.objects.order_by('-title') - 내림차순
+
+boards[1] , boards[1:3]
+
+
+
+## 데이터 수정 (R)board = Board.objects.get(pk=1)
+
+ board.title = 'byebye'
+
+ board.save()
+
+board 
+
+### * save() - board 객체에 id가 없으면 추가, 있으면 수정
+
+### create 
+
+1. 글을 작성하는 페이지를 render 할 view 함수
+2. db에 값을 저장해주는 view 함수 필요(orm db에 값을 저장)
+
+
+
+
+
+dir(board) : board란 객체로 쓸수있는 메소드
+
+
+
+
+
+## get과 post 차이
+
+- html 파일 줘(GET)
+
+- ~한 레코드(글)을 생성해줘!(POST)
+
+- 데이터 관련정보는 url에 노출되면 안된다.
+
+- DB를 건드리기 떄문에 최소한의 신원확인이 필요하다 . 즉, csrf token을 통해 검증된 요청을 받아야한다.
+
+- [결론] : POST요청은 html문서를 렌더링하는 것이 아니다. 요청을 처리하고나서 결과를 보여주는게 아니라, 결과를 보여위한 페이지로 넘겨줘야한다.(**redirect**)
+
+- ```python
+  from django.shortcuts import render, redirect
+  ```
+
+
+
+## 테이블 생성한 이후에 admin 생성
+
+`$ python manage.py createsuperuser`
+
+`$ sqlite3 db.sqlite3`
+
+`sqlite> .tables`
+
+`sqlite> select * from auth_user;`
+

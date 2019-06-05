@@ -1,6 +1,6 @@
 from django.db import models
 
-# Create your models here.
+
 class Board(models.Model):
     # id (pk) 는 기본적으로 처음 테이블 생성시 자동생성된다.
     # id = models.AutoField(primary_key = True)
@@ -11,4 +11,6 @@ class Board(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f'{self.id}글 - {self.title}: {self.content}'
 
